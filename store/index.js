@@ -11,32 +11,15 @@ const state = {
       geometry: {
         type: 'point',
         longitude: -76.57298,
-        latitude: 37.157177,
-      },
-      symbol: {
-         type: 'picture-marker',
-         url: 'static/images/tradoc-logo.png',
-         width: '32px',
-         height: '32px'
-      },
-      title: 'TRADOC HQ',
-      attributes: {
-        type: 'graphic'
-      }
-    },
-    {
-      geometry: {
-        type: 'point',
-        longitude: -85.715375,
-        latitude: 31.340052,
+        latitude: 37.157177
       },
       symbol: {
         type: 'picture-marker',
-        url: 'static/images/CIMT.png',
+        url: 'static/images/tradoc-logo.png',
         width: '32px',
         height: '32px'
       },
-      title: 'CIMT',
+      title: 'TRADOC HQ',
       attributes: {
         type: 'graphic'
       }
