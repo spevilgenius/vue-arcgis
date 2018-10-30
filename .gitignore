@@ -69,3 +69,4 @@ typings/
 *.sln
 .vs/
 /.vs
+*.sqlite

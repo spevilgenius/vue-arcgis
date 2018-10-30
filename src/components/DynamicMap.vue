@@ -28,6 +28,7 @@
   </div>
 </template>
 <script>
+/* eslint-disable */
 import { loadModules } from 'esri-loader'
 var instance = null
 export default {
@@ -56,17 +57,16 @@ export default {
       // get mission data from SharePoint
     },
     setSearchpopup: function () {
-      var top = 0, left = 0
-      this.$refs["viewmodal"].show()
+      this.$refs['viewmodal'].show()
     },
     hidepopup: function () {
-      this.$refs["missionmodal"].hide()
+      this.$refs['missionmodal'].hide()
     },
     addMission: function () {
-      alert("Add Mission for point at " + this.latitude + ", " + this.longitude)
+      alert('Add Mission for point at ' + this.latitude + ', ' + this.longitude)
     },
     addLNO: function () {
-      alert("Add LNO for point at " + this.latitude + ", " + this.longitude)
+      alert('Add LNO for point at ' + this.latitude + ', ' + this.longitude)
     }
   },
   mounted: function () {
@@ -82,7 +82,7 @@ export default {
     ], {
       // use a specific version instead of latest 4.x
       url: 'https://js.arcgis.com/4.9/'
-      }).then(([Map, MapView, watchUtils, Search, GraphicsLayer, Graphic, PopupTemplate]) => {
+    }).then(([Map, MapView, watchUtils, Search, GraphicsLayer, Graphic, PopupTemplate]) => {
       // create map with the given options at a DOM node w/ id 'mapNode'
       let map
       if (!this.$store.state.map) {
@@ -128,15 +128,15 @@ export default {
       })
 
       var missionlayer = new GraphicsLayer({
-        id: "missionlayer",
-        title: "Mission Layer"
-      });
+        id: 'missionlayer',
+        title: 'Mission Layer'
+      })
 
-      map.add(missionlayer);
+      map.add(missionlayer)
 
       view.when(function () {
         // Watch for when features are selected
-        view.popup.watch("selectedFeature", function (graphic) {
+        view.popup.watch('selectedFeature', function (graphic) {
           if (graphic && graphic.attributes.type === 'graphic') {
             // the purpose of the attributes type is because the search widget also uses the view popup so this separates the search from the layers
             // The view popup is hidden with css as we are rolling our own bootstrap popup.
@@ -144,10 +144,10 @@ export default {
             instance.latitude = graphic.geometry.latitude
             instance.longitude = graphic.geometry.longitude
             instance.title = graphic.title
-            instance.$refs["missionmodal"].show()
+            instance.$refs['missionmodal'].show()
           }
-        });
-      });
+        })
+      })
 
       view.popup.actions = []
 

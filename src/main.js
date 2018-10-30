@@ -1,10 +1,11 @@
-/* eslint-disable no-new */
+/* eslint-disable */
 import Vue from 'vue'
 import App from './App'
 import router from './router'
 import BootstrapVue from 'bootstrap-vue'
 import 'es6-promise/auto'
 import store from '../store'
+import mission from './models/Mission'
 
 import 'bootstrap/dist/css/bootstrap.css'
 import 'bootstrap-vue/dist/bootstrap-vue.css'
@@ -14,6 +15,7 @@ Vue.use(BootstrapVue)
 
 Vue.config.productionTip = false
 
+/* eslint-disable */
 new Vue({
   el: '#app',
   store,

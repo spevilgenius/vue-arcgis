@@ -1,3 +1,4 @@
+/* eslint-disable */
 import Vue from 'vue'
 import Vuex from 'vuex'
 
@@ -27,6 +28,4 @@ const state = {
   ]
 }
 
-export default new Vuex.Store({
-  state
-})
+export default new Vuex.Store({ state })
