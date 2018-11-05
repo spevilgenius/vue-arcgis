@@ -47,8 +47,6 @@ export default {
       longitude: null,
       geometry: null,
       feature: null,
-      loading: true,
-      loaded: false,
       isdev: true
     }
   },
@@ -74,7 +72,6 @@ export default {
     loadModules([
       'esri/Map',
       'esri/views/MapView',
-      'esri/core/watchUtils',
       'esri/widgets/Search',
       'esri/layers/GraphicsLayer',
       'esri/Graphic',
@@ -82,7 +79,7 @@ export default {
     ], {
       // use a specific version instead of latest 4.x
       url: 'https://js.arcgis.com/4.9/'
-    }).then(([Map, MapView, watchUtils, Search, GraphicsLayer, Graphic, PopupTemplate]) => {
+    }).then(([Map, MapView, Search, GraphicsLayer, Graphic, PopupTemplate]) => {
       // create map with the given options at a DOM node w/ id 'mapNode'
       let map
       if (!this.$store.state.map) {
@@ -177,10 +174,6 @@ export default {
         // call the method to get data
       }
     })
-  },
-  updated: function () {
-    this.loading = false
-    this.loaded = true
   }
 }
 </script>
@@ -207,19 +200,4 @@ export default {
   min-height: 100px;
   position: relative;
 }
-.loading {
-  color: #2df20f;
-  font-size: 30px;
-  line-height: 30px;
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-}
-.fa-spinner {
-  color: #2df20f;
-  font-size: 30px;
-  line-height: 30px;
-}
-
 </style>
