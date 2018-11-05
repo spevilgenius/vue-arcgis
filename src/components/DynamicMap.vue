@@ -155,10 +155,24 @@ export default {
       if (location.indexOf('hq.') > 0) { this.isdev = false }
 
       if (this.isdev) {
-        for (var l = 0; l < this.$store.state.dummydata.length; l++) {
-          this.$store.state.dummydata[l].popupTemplate = popupTemplate
-          missionlayer.graphics.add(this.$store.state.dummydata[l])
-        }
+        var dd = new Graphic({
+          geometry: {
+            type: 'point',
+            longitude: -76.57298,
+            latitude: 37.157177
+          },
+          symbol: {
+            type: 'picture-marker',
+            url: 'static/img/tradoc-logo.png',
+            width: '32px',
+            height: '32px'
+          },
+          title: 'TRADOC HQ',
+          attributes: {
+            type: 'graphic'
+          }
+        })
+        missionlayer.graphics.add(dd)
       } else {
         // call the method to get data
       }
