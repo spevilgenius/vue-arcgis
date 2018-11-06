@@ -68,32 +68,7 @@ export default {
     }
   },
   mounted: function () {
-    var myMap, view;
-    require([
-      "esri/Basemap",
-      "esri/layers/TileLayer",
-      "esri/Map",
-      "esri/views/MapView",
-      "dojo/domReady!"
-    ], function (Basemap, TileLayer, Map, MapView) {
-      var layer = new TileLayer({
-        url: "https://www.example.com/arcgis/rest/services/Folder/Custom_Base_Map/MapServer"
-      });
-      var customBasemap = new Basemap({
-        baseLayers: [layer],
-        title: "Custom Basemap",
-        id: "myBasemap"
-      });
-      myMap = new Map({
-        basemap: customBasemap
-      });
-      view = new MapView({
-        center: [-111.87, 40.57], // long, lat
-        container: "viewDiv",
-        map: myMap,
-        zoom: 6
-      });
-    });
+    
   }
 }
 </script>

@@ -21,6 +21,9 @@ import 'bootstrap/dist/css/bootstrap.css'
 import 'bootstrap-vue/dist/bootstrap-vue.css'
 import './assets/sass/mascot/main.scss'
 
+// IE11 support
+import './polyfill'
+
 Vue.use(BootstrapVue)
 
 Vue.config.productionTip = false

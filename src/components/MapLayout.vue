@@ -4,7 +4,7 @@
   </div>
 </template>
 <script>
-import DynamicMap from './DynamicMap2.vue'
+import DynamicMap from './DynamicMap.vue'
 
 export default {
   components: {
