@@ -5,7 +5,7 @@ import router from './router'
 import BootstrapVue from 'bootstrap-vue'
 import 'es6-promise/auto'
 // import store from '../store'
-import mission from './models/Mission'
+// import mission from './models/Mission'
 
 import Vuex from 'vuex'
 
