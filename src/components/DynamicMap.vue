@@ -160,7 +160,7 @@ export default {
           },
           symbol: {
             type: 'picture-marker',
-            url: 'static/img/tradoc-logo.png',
+            url: '/sites/msct2/SiteAssets/html/static/img/tradoc-logo.png',
             width: '32px',
             height: '32px'
           },
