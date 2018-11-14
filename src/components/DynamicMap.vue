@@ -29,7 +29,9 @@
 </template>
 <script>
 /* eslint-disable */
-import { loadModules } from 'esri-loader'
+  import { loadModules } from 'esri-loader'
+  var $ = require('jquery')(window)
+  var listdata = require('../listdata')
 var instance = null
 export default {
   name: 'dynamic-map',
@@ -47,7 +49,11 @@ export default {
       longitude: null,
       geometry: null,
       feature: null,
-      isdev: true
+      listsexist: false,
+      isdev: true,
+      message: null,
+      count: 0,
+      total: 0
     }
   },
   methods: {
@@ -60,6 +66,59 @@ export default {
     hidepopup: function () {
       this.$refs['missionmodal'].hide()
     },
+    addLists: function () {
+      console.log(this.listsexist + ", " + listdata)
+      // first check to see if the lists exist. Then let the user create them if they do not.
+      if (!this.listsexist) {
+        // check for the lists and then reset listsexist. If the lists do not exist, prompt the user to let them be created.
+        for (var i = 0; i < listdata.lists.length; i++) {
+          console.log(listdata.lists[i].title)
+          this.total += 1
+          // check to see if the list exists and create it if not. Expect to have sp.js loaded but wrap to ensure that it is.
+          this.addList(listdata.lists[i].title, listdata.lists[i].description)
+        }
+      }
+    },
+    addList: function (list, d) {
+      // will check to see if the list exists and create it if it doesn't
+      var v = this
+      var message
+      SP.SOD.executeFunc('sp.js', 'SP.ClientContext', function () {
+        console.log("Checking lists...Please Wait.")
+        var ctx = new SP.ClientContext.get_current()
+        var exscope = new SP.ExceptionHandlingScope(ctx)
+        var startscope = exscope.startScope()
+
+        var tryscope = exscope.startTry()
+        var testlist = ctx.get_web().get_lists().getByTitle(list)
+        testlist.set_description(d)
+        testlist.update()
+        tryscope.dispose()
+
+        var catchscope = exscope.startCatch()
+        var lci = new SP.ListCreationInformation()
+        lci.set_title(list)
+        lci.set_description(d)
+        lci.set_templateType(SP.ListTemplateType.genericList)
+        ctx.get_web().get_lists().add(lci)
+        catchscope.dispose()
+
+        var finallyscope = exscope.startFinally()
+        var newlist = ctx.get_web().get_lists().getByTitle(list)
+        newlist.set_description(d)
+        newlist.update()
+
+        finallyscope.dispose()
+        startscope.dispose()
+
+        ctx.executeQueryAsync(function () {
+          v.count += 1
+          console.log("List Done: " + v.total + ", " + v.count)
+        }, function (sender, args) {
+          console.log("Error because list doesn't exist " + args.get_message())
+        })
+      });
+    },
     addMission: function () {
       alert('Add Mission for point at ' + this.latitude + ', ' + this.longitude)
     },
@@ -68,6 +127,7 @@ export default {
     }
   },
   mounted: function () {
+    this.addLists()
     instance = this
     loadModules([
       'esri/Map',
