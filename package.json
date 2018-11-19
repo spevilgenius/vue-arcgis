@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "A Vue.js project",
   "author": "OCKOTradoc <OCKOTradoc@users.noreply.github.com>",
-  "private": true,
+  "private": false,
   "scripts": {
     "dev": "node build/dev-server.js",
     "start": "cross-env ENABLE_ESLINT=true node build/dev-server.js",

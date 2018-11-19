@@ -1,6 +1,8 @@
 <template>
   <div id="mapwrapper">
-    <div class="toolbar" id="toolbar"></div>
+    <div class="toolbar" id="toolbar">
+      <b-btn v-if="ready" size="sm" @click="addLists">Add Lists</b-btn>
+    </div>
     <div class="map" id="mapdiv"></div>
     <b-modal id="ViewModal" ref="viewmodal" cancel-disabled centered title="Add Item To MASCOT">
       <b-container fluid>
@@ -29,9 +31,9 @@
 </template>
 <script>
 /* eslint-disable */
-  import { loadModules } from 'esri-loader'
-  var $ = require('jquery')(window)
-  var listdata = require('../listdata')
+import { loadModules } from 'esri-loader'
+var $ = require('jquery')(window)
+var listdata = require('../listdata')
 var instance = null
 export default {
   name: 'dynamic-map',
@@ -50,11 +52,18 @@ export default {
       geometry: null,
       feature: null,
       listsexist: false,
+      ready: false,
       isdev: true,
       message: null,
       count: 0,
       total: 0
     }
+  },
+  created: function () {
+    instance = this
+    SP.SOD.executeFunc('sp.js', 'SP.ClientContext', function () {
+      instance.ready = true
+    })
   },
   methods: {
     getMissions: function () {
@@ -67,57 +76,38 @@ export default {
       this.$refs['missionmodal'].hide()
     },
     addLists: function () {
-      console.log(this.listsexist + ", " + listdata)
-      // first check to see if the lists exist. Then let the user create them if they do not.
-      if (!this.listsexist) {
-        // check for the lists and then reset listsexist. If the lists do not exist, prompt the user to let them be created.
-        for (var i = 0; i < listdata.lists.length; i++) {
-          console.log(listdata.lists[i].title)
-          this.total += 1
-          // check to see if the list exists and create it if not. Expect to have sp.js loaded but wrap to ensure that it is.
-          this.addList(listdata.lists[i].title, listdata.lists[i].description)
-        }
-      }
-    },
-    addList: function (list, d) {
-      // will check to see if the list exists and create it if it doesn't
-      var v = this
-      var message
-      SP.SOD.executeFunc('sp.js', 'SP.ClientContext', function () {
-        console.log("Checking lists...Please Wait.")
+      for (var i = 0; i < listdata.lists.length; i++) {
+        console.log(listdata.lists[i].title)
+        instance.total += 1
+
+        var zebra = {}
+        zebra.title = listdata.lists[i].title
+        zebra.description = listdata.lists[i].description
+        zebra.fields = listdata.lists[i].fields
         var ctx = new SP.ClientContext.get_current()
-        var exscope = new SP.ExceptionHandlingScope(ctx)
-        var startscope = exscope.startScope()
-
-        var tryscope = exscope.startTry()
-        var testlist = ctx.get_web().get_lists().getByTitle(list)
-        testlist.set_description(d)
-        testlist.update()
-        tryscope.dispose()
-
-        var catchscope = exscope.startCatch()
         var lci = new SP.ListCreationInformation()
-        lci.set_title(list)
-        lci.set_description(d)
+        lci.set_title(listdata.lists[i].title)
+        lci.set_description(listdata.lists[i].description)
         lci.set_templateType(SP.ListTemplateType.genericList)
         ctx.get_web().get_lists().add(lci)
-        catchscope.dispose()
 
-        var finallyscope = exscope.startFinally()
-        var newlist = ctx.get_web().get_lists().getByTitle(list)
-        newlist.set_description(d)
-        newlist.update()
-
-        finallyscope.dispose()
-        startscope.dispose()
-
-        ctx.executeQueryAsync(function () {
-          v.count += 1
-          console.log("List Done: " + v.total + ", " + v.count)
-        }, function (sender, args) {
-          console.log("Error because list doesn't exist " + args.get_message())
+        ctx.executeQueryAsync(
+          this.listAdded
+          , function (sender, args) {
+            console.log("Error because list doesn't exist " + args.get_message())
         })
-      });
+      }
+    },
+    listAdded: function () {
+      instance.count += 1
+      console.log("List Done: " + instance.total + ", " + instance.count)
+      if (instance.count === instance.total) {
+        for (var i = 0; i < listdata.lists.length; i++) {
+          for (var j = 0; j < listdata.lists[i].fields.length; j++) {
+            console.log("Field: " + listdata.lists[i].fields[j].Title)
+          }
+        }
+      }
     },
     addMission: function () {
       alert('Add Mission for point at ' + this.latitude + ', ' + this.longitude)
@@ -126,9 +116,7 @@ export default {
       alert('Add LNO for point at ' + this.latitude + ', ' + this.longitude)
     }
   },
-  mounted: function () {
-    this.addLists()
-    instance = this
+  mounted: function () {    
     loadModules([
       'esri/Map',
       'esri/views/MapView',
