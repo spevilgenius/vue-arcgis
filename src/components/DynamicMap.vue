@@ -56,13 +56,15 @@ export default {
       isdev: true,
       message: null,
       count: 0,
-      total: 0
+      total: 0,
+      wsu: _spPageContextInfo.webAbsoluteUrl
     }
   },
   created: function () {
     instance = this
     SP.SOD.executeFunc('sp.js', 'SP.ClientContext', function () {
       instance.ready = true
+      console.log("URL: " + instance.wsu)
     })
   },
   methods: {
@@ -79,11 +81,6 @@ export default {
       for (var i = 0; i < listdata.lists.length; i++) {
         console.log(listdata.lists[i].title)
         instance.total += 1
-
-        var zebra = {}
-        zebra.title = listdata.lists[i].title
-        zebra.description = listdata.lists[i].description
-        zebra.fields = listdata.lists[i].fields
         var ctx = new SP.ClientContext.get_current()
         var lci = new SP.ListCreationInformation()
         lci.set_title(listdata.lists[i].title)
@@ -94,7 +91,7 @@ export default {
         ctx.executeQueryAsync(
           this.listAdded
           , function (sender, args) {
-            console.log("Error because list doesn't exist " + args.get_message())
+            console.log("Error because list already exists or you are a goober " + args.get_message())
         })
       }
     },
@@ -102,11 +99,72 @@ export default {
       instance.count += 1
       console.log("List Done: " + instance.total + ", " + instance.count)
       if (instance.count === instance.total) {
+        instance.count = 0
+        instance.total = 0
         for (var i = 0; i < listdata.lists.length; i++) {
+          instance.total += 1
+          var ctx = new SP.ClientContext.get_current()
+          var list = ctx.get_web().get_lists().getByTitle(listdata.lists[i].title)
+          var field_name
+
           for (var j = 0; j < listdata.lists[i].fields.length; j++) {
             console.log("Field: " + listdata.lists[i].fields[j].Title)
+            var field = listdata.lists[i].fields[j]
+
+            var rich_text;
+            if (field.Type === 'Note') {
+              if (field.Format === 'Plain') {
+                rich_text = ' RichText="FALSE"'
+              } else {
+                rich_text = ' RestrictedMode="TRUE" RichText="TRUE" RichTextMode="FullHtml"'
+              }
+            } else {
+              rich_text = ''
+            }
+
+            var date = (field.Type === 'DateTime' ? ' Format="' + field.Format + '"' : '')
+
+            if (field.Type === 'Choice') {
+              var dropdownChoices = (field.Type === 'Choice' ? field.Choices.split(',') : [])
+              var choiceDropDownField = ctx.castTo(list.get_fields().addFieldAsXml('<Field Type="Choice" DisplayName="' + field.DisplayName + '" Name="' + field.Title + '" Required="' + field.Required.toUpperCase() + '" Format="Dropdown" />', true, SP.AddFieldOptions.addToDefaultContentType), SP.FieldChoice)
+              choiceDropDownField.set_choices(dropdownChoices)
+              choiceDropDownField.update()
+            } else if (field.Type === 'Title') {
+              var fc = list.get_fields()
+              field_name = fc.getByTitle("Title")
+              field_name.set_title(field.DisplayName)
+              field_name.set_required(true)
+              field_name.update()
+            } else if (field.Type === 'MultiChoice') {
+              var mdropdownChoices = field.Choices.split(',')
+              var mdc = '<Field Type="MultiChoice" DisplayName="' + field.DisplayName + '" Name="' + field.Title + '" Required="' + field.Required.toUpperCase() + '" >'
+              mdc += '<CHOICES>'
+              for (var k = 0; k < mdropdownChoices.length; k++) {
+                mdc += '<CHOICE>' + mdropdownChoices[k] + '</CHOICE>'
+              }
+              mdc += '</CHOICES></Field>'
+              field_name = list.get_fields().addFieldAsXml(mdc, true)
+              field_name.update()
+            } else {
+              field_name = list.get_fields().addFieldAsXml('<Field Type="' + field.Type + '" DisplayName="' + field.DisplayName + '" Name="' + field.Title + '" Required="' + field.Required.toUpperCase() + '"' + rich_text + date + ' />', true, SP.AddFieldOptions.addToDefaultContentType)
+              field_name.update()
+            }
+
+            ctx.load(field_name)
           }
+
+          ctx.executeQueryAsync(
+            this.fieldsAdded
+            , function (sender, args) {
+              console.log("Error adding fields to list " + args.get_message())
+            })
         }
+      }
+    },
+    fieldsAdded: function () {
+      instance.count += 1;
+      if (instance.count === instance.total) {
+        console.log("All lists and fields created.")
       }
     },
     addMission: function () {
