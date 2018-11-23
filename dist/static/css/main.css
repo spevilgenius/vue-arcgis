@@ -1,4 +1,4 @@
-#mapwrapper{height:100vh;width:100%}#toolbar{height:10vh}#mapdiv,#toolbar,#txtSearch{width:100%}#mapdiv{height:90vh;z-index:100}.panel-body,.widgetbody{min-height:100px}.widgetbody{width:100%;position:relative}/*!
+#mapwrapper{height:100vh;width:100%}#mapdiv,#toolbar,#txtSearch{width:100%}#mapdiv{height:90vh;z-index:100}#pagewrapper{height:100vh;width:100%}#ganttdivwrapper{height:90vh;width:100%;z-index:100}#toolbar{height:10vh;width:100%}.panel-body,.widgetbody{min-height:100px}.widgetbody{width:100%;position:relative}/*!
  * Bootstrap v4.1.3 (https://getbootstrap.com/)
  * Copyright 2011-2018 The Bootstrap Authors
  * Copyright 2011-2018 Twitter, Inc.

@@ -1,7 +1,9 @@
 <template>
   <div id="mapwrapper">
     <div class="toolbar" id="toolbar">
-      <b-btn v-if="ready" size="sm" @click="addLists">Add Lists</b-btn>
+      <!--<b-btn v-if="ready" size="sm" @click="addLists">Add Lists</b-btn>-->
+      <a class="btn btn-warning" @click="toggleGantt" href="#">Switch To Gantt</a>
+      <!--<router-link to="/Gantt" class="btn btn-warning">Switch To Gantt</router-link>-->
     </div>
     <div class="map" id="mapdiv"></div>
     <b-modal id="ViewModal" ref="viewmodal" cancel-disabled centered title="Add Item To MASCOT">
@@ -32,9 +34,10 @@
 <script>
 /* eslint-disable */
 import { loadModules } from 'esri-loader'
-var $ = require('jquery')(window)
+var jQuery = require('jquery')(window)
 var listdata = require('../listdata')
 var instance = null
+var map
 export default {
   name: 'dynamic-map',
   data: function () {
@@ -68,6 +71,11 @@ export default {
     })
   },
   methods: {
+    toggleGantt: function () {
+      console.log('GitRDone!')
+      this.$store.state.map = map
+      this.$router.push({ name: 'GanttLayout' })
+    },
     getMissions: function () {
       // get mission data from SharePoint
     },
@@ -122,6 +130,8 @@ export default {
               rich_text = ''
             }
 
+            var jslink = field.JSLink !== null || field.JSLink !== undefined ? ' JSLink="' + field.JSLink + '"' : ''
+
             var date = (field.Type === 'DateTime' ? ' Format="' + field.Format + '"' : '')
 
             if (field.Type === 'Choice') {
@@ -135,6 +145,10 @@ export default {
               field_name.set_title(field.DisplayName)
               field_name.set_required(true)
               field_name.update()
+            } else if (field.Type === 'Picture') {
+              var pf = '<Field Type="URL" Name="' + field.Title + '" DisplayName="' + field.DisplayName + '" Format="Image" Required="' + field.Required.toUpperCase() + '" />'
+              field_name = list.get_fields().addFieldAsXml(pf, true)
+              field_name.update()
             } else if (field.Type === 'MultiChoice') {
               var mdropdownChoices = field.Choices.split(',')
               var mdc = '<Field Type="MultiChoice" DisplayName="' + field.DisplayName + '" Name="' + field.Title + '" Required="' + field.Required.toUpperCase() + '" >'
@@ -146,7 +160,7 @@ export default {
               field_name = list.get_fields().addFieldAsXml(mdc, true)
               field_name.update()
             } else {
-              field_name = list.get_fields().addFieldAsXml('<Field Type="' + field.Type + '" DisplayName="' + field.DisplayName + '" Name="' + field.Title + '" Required="' + field.Required.toUpperCase() + '"' + rich_text + date + ' />', true, SP.AddFieldOptions.addToDefaultContentType)
+              field_name = list.get_fields().addFieldAsXml('<Field Type="' + field.Type + '" DisplayName="' + field.DisplayName + '" Name="' + field.Title + '" Required="' + field.Required.toUpperCase() + '"' + rich_text + date + jslink + ' />', true, SP.AddFieldOptions.addToDefaultContentType)
               field_name.update()
             }
 
@@ -187,7 +201,7 @@ export default {
       url: 'https://js.arcgis.com/4.9/'
     }).then(([Map, MapView, Search, GraphicsLayer, Graphic, PopupTemplate]) => {
       // create map with the given options at a DOM node w/ id 'mapNode'
-      let map
+      
       if (!this.$store.state.map) {
         map = new Map({
           basemap: 'streets'

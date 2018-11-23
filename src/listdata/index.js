@@ -25,6 +25,13 @@ var listdata = module.exports = {
           'Format': 'DateOnly',
           'Required': 'true'
         },
+        //{
+        //  'Title': 'MissionCategory',
+        //  'DisplayName': 'MissionCategory',
+        //  'Type': 'Text',
+        //  'Required': 'false',
+        //  'JSLink': '~sitecollection/SiteAssets/html/static/js/MissionCategory.js'
+        //},
         {
           'Title': 'Task',
           'DisplayName': 'Mission Task or Purpose',
@@ -60,6 +67,12 @@ var listdata = module.exports = {
           'Title': 'PAXNames',
           'DisplayName': 'PAX Names',
           'Type': 'Note',
+          'Required': 'true'
+        },
+        {
+          'Title': 'IconImage',
+          'DisplayName': 'Icon Image',
+          'Type': 'Picture',
           'Required': 'true'
         },
         {
