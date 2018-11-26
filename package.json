@@ -1,8 +1,8 @@
 {
-  "name": "vue-mascot",
+  "name": "vue-arcgis",
   "version": "1.0.0",
   "description": "A Vue.js project",
-  "author": "OCKOTradoc <OCKOTradoc@users.noreply.github.com>",
+  "author": "Daniel Walker",
   "private": false,
   "scripts": {
     "dev": "node build/dev-server.js",
